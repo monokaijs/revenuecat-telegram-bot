@@ -19,14 +19,13 @@ export const POST = async (req: NextRequest) => {
       apiKey: OPENAI_API_KEY,
     });
     const aiResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{
+      model: "gpt-3.5-turbo", messages: [{
         role: 'system',
-        content: 'Your main goal is format the RevenueCat webhook data into a informative, interesting and concise message to send to user. The data is about customer purchased premium plan in a mobile app.\n' + 'You can use emojis to make your message more attractive. Convert price to VND (1 USD is 24500 VND).\nAnd do not say anything else.',
+        content: 'You are an assistant to write messages to user to notice about recent received RevenueCat purchases.\n' + 'Your main goal is format the data into a informative, interesting and concise message to send to user.\n' + 'You can use emojis to make your message more attractive. If price is not available, just write "Price not available".\nAnd do not say anything else.',
       }, {
         role: 'user',
         content: `Here is the data:\n\n${JSON.stringify(body)}`,
-      }], max_tokens: 150,
+      }],
     });
 
     const message = aiResponse.choices[0].message.content;
