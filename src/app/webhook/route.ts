@@ -19,7 +19,7 @@ export const POST = async (req: NextRequest) => {
       apiKey: OPENAI_API_KEY,
     });
     const aiResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", messages: [{
+      model: "gpt-4o", messages: [{
         role: 'system',
         content: 'You are an assistant to write messages to user to notice about recent received RevenueCat purchases.\n' + 'Your main goal is format the data into a informative, interesting and concise message to send to user.\n' + 'You can use emojis to make your message more attractive. Price is in USD, convert to VND and send VND price. If price is not available, just write "Price not available".\nAnd do not say anything else.',
       }, {
