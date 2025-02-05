@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import axios from 'axios';
-import {OpenAI} from 'openai';
+import dayjs from 'dayjs';
 
 // Telegram bot token and chat ID
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_TOKEN;
@@ -15,24 +15,19 @@ export const POST = async (req: NextRequest) => {
     if (WEBHOOK_SECRET && signature !== WEBHOOK_SECRET) {
       return NextResponse.json({message: 'Unauthorized'}, {status: 401});
     }
-    const openai = new OpenAI({
-      apiKey: OPENAI_API_KEY,
-    });
-    const aiResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", messages: [{
-        role: 'system',
-        content: 'You are an assistant to write messages to user to notice about recent received RevenueCat purchases.\n' + 'Your main goal is format the data into a informative, interesting and concise message to send to user.\n' + 'You can use emojis to make your message more attractive. If price is not available, just write "Price not available".\nAnd do not say anything else.',
-      }, {
-        role: 'user',
-        content: `Here is the data:\n\n${JSON.stringify(body)}`,
-      }],
-    });
 
-    const message = aiResponse.choices[0].message.content;
+    const {event} = body;
+    if (event.type !== 'INITIAL_PURCHASE') return;
+    const {country_code, currency, environment, event_timestamp_ms, presented_offering_id, price, store} = event;
+    const message = `🎉🎉 Alo đại vương ơi, có người vừa mua hàng kìa!!! 🎉🎉\n\n` +
+      `Khách yêu từ ${store} (${country_code}) vừa mua *${presented_offering_id}* vào lúc ${dayjs(event_timestamp_ms).format('HH:mm')}\n\n` +
+      `Đại vương vừa bỏ túi 🤏 ${(price * 25000).toLocaleString()} VND tiền bỉm sữa. Bú bú bú. 😎`;
+
     const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     await axios.post(telegramUrl, {
       chat_id: TELEGRAM_CHAT_ID,
       text: message,
+      parse_mode: 'Markdown'
     });
 
     return NextResponse.json({message: 'Webhook received and processed successfully'});
