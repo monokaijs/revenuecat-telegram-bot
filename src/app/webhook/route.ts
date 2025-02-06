@@ -34,6 +34,6 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({message: 'Webhook received and processed successfully'});
   } catch (error) {
     console.log('err', error);
-    return NextResponse.json({message: 'Internal server error'}, {status: 500});
+    return NextResponse.json({message: 'Internal server error', error}, {status: 500});
   }
 }
