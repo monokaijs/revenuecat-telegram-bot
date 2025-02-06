@@ -17,17 +17,16 @@ export const POST = async (req: NextRequest) => {
     }
 
     const {event} = body;
-    if (event.type === 'INITIAL_PURCHASE') {
+    if (event.type === 'INITIAL_PURCHASE' || event.type === 'NON_RENEWING_PURCHASE') {
       const {country_code, currency, environment, event_timestamp_ms, presented_offering_id, price, store} = event;
       const message = `🎉🎉 Alo đại vương ơi, có người vừa mua hàng kìa!!! 🎉🎉\n\n` +
-        `Khách yêu từ ${store} (${country_code}) vừa mua *${presented_offering_id}* vào lúc ${dayjs(event_timestamp_ms).format('HH:mm')}\n\n` +
+        `Khách yêu từ ${store} (${country_code}) vừa mua ${presented_offering_id} vào lúc ${dayjs(event_timestamp_ms).format('HH:mm')}\n\n` +
         `Đại vương vừa bỏ túi 🤏 ${(price * 25000).toLocaleString()} VND tiền bỉm sữa. Bú bú bú. 😎`;
 
       const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
       await axios.post(telegramUrl, {
         chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown'
+        text: message
       });
     }
 
